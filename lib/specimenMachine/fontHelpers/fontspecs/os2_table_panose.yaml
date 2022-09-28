@@ -1,0 +1,136 @@
+bFamilyType:
+    0: Any
+    1: No Fit
+    2: Latin Text
+    3: Latin Hand Written
+    4: Latin Decorative
+    5: Latin Symbol     
+
+bSerifStyle:  
+    0: Any
+    1: No Fit
+    2: Cove
+    3: Obtuse Cove
+    4: Square Cove
+    5: Obtuse Square Cove
+    6: Square
+    7: Thin
+    8: Oval
+    9: Exaggerated
+    10: Triangle
+    11: Normal Sans
+    12: Obtuse Sans
+    13: Perpendicular Sans
+    14: Flared
+    15: Rounded  
+
+bWeight:
+    0: Any
+    1: No Fit
+    2: Very Light
+    3: Light
+    4: Thin
+    5: Book
+    6: Medium
+    7: Demi
+    8: Bold
+    9: Heavy
+    10: Black
+    11: Extra Black 
+
+bProportion:
+    0: Any
+    1: No fit
+    2: Old Style
+    3: Modern
+    4: Even Width
+    5: Extended
+    6: Condensed
+    7: Very Extended
+    8: Very Condensed
+    9: Monospaced     
+
+bContrast: 
+    0: Any
+    1: No Fit
+    2: None
+    3: Very Low
+    4: Low
+    5: Medium Low
+    6: Medium
+    7: Medium High
+    8: High
+    9: Very High  
+
+bStrokeVariation: 
+    0: Any
+    1: No Fit
+    2: No Variation
+    3: Gradual/Diagonal
+    4: Gradual/Transitional
+    5: Gradual/Vertical
+    6: Gradual/Horizontal
+    7: Rapid/Vertical
+    8: Rapid/Horizontal
+    9: Instant/Vertical
+    10: Instant/Horizontal
+
+bArmStyle:  
+    0: Any
+    1: No Fit
+    2: Straight Arms/Horizontal
+    3: Straight Arms/Wedge
+    4: Straight Arms/Vertical
+    5: Straight Arms/Single Serif
+    6: Straight Arms/Double Serif
+    7: Non-Straight/Horizontal
+    8: Non-Straight/Wedge
+    9: Non-Straight/Vertical
+    10: Non-Straight/Single Serif
+    11: Non-Straight/Double Serif  
+
+bLetterForm: 
+    0: Any
+    1: No Fit
+    2: Normal/Contact
+    3: Normal/Weighted
+    4: Normal/Boxed
+    5: Normal/Flattened
+    6: Normal/Rounded
+    7: Normal/Off Center
+    8: Normal/Square
+    9: Oblique/Contact
+    10: Oblique/Weighted
+    11: Oblique/Boxed
+    12: Oblique/Flattened
+    13: Oblique/Rounded
+    14: Oblique/Off Center
+    15: Oblique/Square
+
+
+bMidline: 
+    0: Any
+    1: No Fit
+    2: Standard/Trimmed
+    3: Standard/Pointed
+    4: Standard/Serifed
+    5: High/Trimmed
+    6: High/Pointed
+    7: High/Serifed
+    8: Constant/Trimmed
+    9: Constant/Pointed
+    10: Constant/Serifed
+    11: Low/Trimmed
+    12: Low/Pointed
+    13: Low/Serifed
+
+
+bXHeight:
+    0: Any
+    1: No Fit
+    2: Constant/Small
+    3: Constant/Standard
+    4: Constant/Large
+    5: Ducking/Small
+    6: Ducking/Standard
+    7: Ducking/Large
