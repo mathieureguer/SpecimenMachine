@@ -1,5 +1,5 @@
 # import drawbotgrid.grid as dbgrid
-from ..fontHelpers import load_font_dir, load_font_list
+from .fontHelpers import load_font_dir, load_font_list
 
 import drawBot as db
 from fontTools.ttLib import TTFont
@@ -116,8 +116,7 @@ class SMFontCollection(SMSettings):
         elif self.font_directory != None:
             self.fonts = load_font_dir(self.director.root_dir / self.font_directory)
         else:
-            self.font_directory = "."
-            self.fonts = load_font_dir(self.director.root_dir / self.font_directory)
+            self.fonts = load_font_dir(self.director.input_path)
         self.font_paths = [str(f.path.relative_to(self.director.root_dir)) for f in self.fonts]
 
     def _private_populate_attributes(self):
@@ -248,8 +247,6 @@ class SMGlyphSorter(SMBase):
         return categories
 
 
-
-
 class SMSection(SMSettings):
 
     def __init__(self, director, settings):
@@ -283,11 +280,17 @@ class SMDirector(SMBase):
     default_settings = {}
 
 
-    def __init__(self, root_dir, columns=None, baselines=None):
+    def __init__(self, input_path, single_font_mode=False, columns=None, baselines=None):
 
-        self.root_dir = pathlib.Path(root_dir)
+        self.input_path = pathlib.Path(input_path)
+        if self.input_path.is_dir():
+            self.root_dir = self.input_path
+        else:
+            self.root_dir = self.input_path.parent
+
         self.settings_path =  self.root_dir/SETTINGS_FILE_NAME
         self.section_settings = self.look_for_settings()
+                
         self.columns = columns
         self.baselines = baselines
         self.sections = []
@@ -295,6 +298,9 @@ class SMDirector(SMBase):
         self.assign_required_section_to_attributes()
         self.populate_required_sections()
         self.populate_other_sections()
+
+        # should this be dealt with at a higher level?
+        self.single_font_mode = single_font_mode
 
 
     def look_for_settings(self):
@@ -361,7 +367,6 @@ class SMDirector(SMBase):
         family_names = self.fonts.common_family_name
         now = datetime.datetime.now()
         db.newDrawing()
-
         self._draw()
 
         if output_dir == None:
