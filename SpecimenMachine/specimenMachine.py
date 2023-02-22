@@ -126,6 +126,10 @@ class SMFontCollection(SMSettings):
     def common_family_name(self):
         return self.get_common_fonts_attribute("prefered_family_name")
 
+    @property
+    def common_style_name(self):
+        return self.get_common_fonts_attribute("prefered_style_name")
+
     def get_common_fonts_attribute(self, attribute):
         attrs = [getattr(f, attribute) for f in self.fonts]
         return self._remove_duplicate_in_list(attrs)
@@ -138,10 +142,10 @@ class SMFontCollection(SMSettings):
     def get_font_names_as_formatted_string(self, sep="\n", **kwargs):
         if not sep:
             sep = ""
-        fs = db.FormattedString(**kwargs)
+        fs = db.FormattedString()
         for i, font in enumerate(self.fonts):
             fs.append(f"{font.prefered_family_name} {font.prefered_style_name}",
-                      font=font.path)
+                      font=font.path, **kwargs)
             if i+1 < len(font):
                 fs.append(sep)
         return fs
@@ -150,10 +154,10 @@ class SMFontCollection(SMSettings):
     def get_font_sample_as_formatted_string(self, sample_str, sep="\n", **kwargs):
         if not sep:
             sep = ""
-        fs = db.FormattedString(**kwargs)
+        fs = db.FormattedString()
         for i, font in enumerate(self.fonts):
             fs.append(sample_str,
-                      font=font.path)
+                      font=font.path, **kwargs)
             if i+1 < len(font):
                 fs.append(sep)
         return fs
@@ -364,19 +368,40 @@ class SMDirector(SMBase):
 
 
     def draw(self, output_dir=None):
-        family_names = self.fonts.common_family_name
-        now = datetime.datetime.now()
-        db.newDrawing()
-        self._draw()
 
-        if output_dir == None:
-            output_dir = self.root_dir
+        if self.single_font_mode:
+            targets = [self.section_map["fonts"](self, {"font_paths": [path]}) for path in self.fonts.font_paths]
+        else:
+            targets = [self.fonts]
 
-        out = output_dir / f"{''.join(family_names)}-specimenMachine-{now.strftime('%Y%m%d-%H%M')}.pdf"
-        db.saveImage(out)
-        print(f"-- saved {out}")
+        original_fonts = self.fonts
+        for fonts in targets:
+            self.fonts = fonts
+            self.fonts.populate_attributes()
 
-        db.endDrawing()
+            family_names = self.fonts.common_family_name
+            style_names = self.fonts.common_style_name
+
+            if len(style_names) > 1:
+                font_collection_name = f"{''.join(family_names)}"
+            else:
+                font_collection_name = f"{''.join(family_names)}-{''.join(style_names)}"
+            font_collection_name = font_collection_name.replace(" ", "")
+
+            now = datetime.datetime.now()
+            db.newDrawing()
+            self._draw()
+
+            if output_dir == None:
+                output_dir = self.root_dir
+
+            out = output_dir / f"{now.strftime('%Y%m%d-%H%M')}-specimenMachine-{font_collection_name}.pdf"
+            db.saveImage(out)
+            print(f"-- saved {out}")
+
+            db.endDrawing()
+
+        self.fonts = original_fonts
 
     def _draw(self):
         draw_last = []
