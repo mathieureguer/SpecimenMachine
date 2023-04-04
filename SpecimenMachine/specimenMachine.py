@@ -17,8 +17,8 @@ SETTINGS_FILE_NAME = "settings.yaml"
 AUTO_TOKEN  = "<auto>"
 FILL_TOKEN  = "<fill>"
 
-
 # ----------------------------------------
+
 def path_presenter(dumper, data):
     return dumper.represent_scalar('tag:yaml.org,2002:str', str(data))
 
@@ -99,16 +99,6 @@ class SMSettings(SMBase):
         self.settings_raw.update(self.defaults)
         self.settings_raw.update(self.user_settings)
     
-    # def _load_settings_fill(self):
-    #     self.settings_fill = Dict()
-    #     self.current_settings = self.settings_fill 
-    #     self._load_recursive_autofill_dict(self.settings_fill, self.settings_raw, FILL_TOKEN)
-
-    # def _load_settings_auto(self):
-    #     self.settings = Dict()
-    #     self.current_settings = self.settings 
-    #     self._load_recursive_autofill_dict(self.settings, self.settings_fill, AUTO_TOKEN)
-
     def _autofill_settings(self):
         """
         this autofill values for both autofill tokens of key at a time 
@@ -159,100 +149,7 @@ class SMSettings(SMBase):
 
     def _get_autofill_funct_name(self, chained_keys):
         return f"autofill_{'_'.join(chained_keys)}"
-    
-
-
-# class SMSettings_OLD(SMBase):
-#     attributes = {}
-#     POPULATE_TRIGGER  = "<?>"
-#     AUTO_TRIGGER  = "<auto>"
-
-#     def __init__(self, director, settings):
-#         self.settings = settings
-#         self.director = director
-#         self.load_settings(self.attributes)
-#         self.load_settings(self.settings)
-
-#     def populate_default_value(self):
-#         return NotImplemented
-
-#     # def all_setting_as_dict(self):
-#     #     settings = {attr: getattr(self, attr) for attr in self.attributes}
-#     #     auto = {attr: valu for attr, value in self.attributes.items() if value==self.AUTO_TRIGGER}
-#     #     settings.update(auto)
-#     #     return settings
-
-#     def load_settings(self, settings):
-#         if settings != self.POPULATE_TRIGGER:
-#             for attr, value in settings.items():
-#                 if value == self.POPULATE_TRIGGER or value == self.AUTO_TRIGGER:
-#                     value = self.attributes.get(attr)
-#                 setattr(self, attr, value)
-#         # self._private_populate_attributes()
-#         # self.populate_attributes()
-
-#     def public_populate_attributes(self):
-#         """
-#         override this to set up you own populating methods
-#         """
-#         pass
-
-#     def _private_populate_attributes(self):
-#         """
-#         this is used by the library to load things 
-#         that subclasses should not have to worry about
-#         """
-#         pass
-
-#     def populate_attributes(self):
-#         self._private_populate_attributes()
-#         self.public_populate_attributes()
-
-#     # def get_autocompleted_settings(self):
-#     #     """
-#     #     this will add the self.attribute value 
-#     #     to each key attribute a value of <?> in self.settings 
-#     #     """
-#     #     updated_settings = {}
-#     #     for k, v in self.settings.items():
-#     #         if v == self.POPULATE_TRIGGER:
-#     #             updated_settings[k] = getattr(self, k)
-#     #         else:
-#     #             updated_settings[k] = v
-#     #     return updated_settings
-
-#     def is_attribute_real(self, attribute):
-#         value = getattr(self, attribute)
-#         return self._is_value_real(value)
-
-#     def _is_value_real(self, value):
-#         return value != None and value != self.POPULATE_TRIGGER
-
-#     def draw(self):
-#         pass
-
-#     @property
-#     def user_populated_settings(self):
-#         if self.settings == self.POPULATE_TRIGGER:
-#             out = self._get_populated_dict(self.attributes)
-#         else:
-#             out = self._get_populated_dict(self.settings, skip_none_values=True)
-
-#         print("user_pop", out)
-#         return out
-
-#     def _get_populated_dict(self, dict, skip_none_values=False):
-#         out = {}
-#         for k, v in dict.items():
-#             if v == self.POPULATE_TRIGGER:
-#                 v = getattr(self, k)
-#             if not skip_none_values or v:
-#                 out[k] = v
-#         return out
-
-
-#         # return {attr: getattr(self, attr) for attr in self.attributes}
-
+ 
 
 class SMFontCollection(SMSettings):
     defaults = {
@@ -283,19 +180,7 @@ class SMFontCollection(SMSettings):
     # ----------------------------------------
     
     def load_fonts(self):
-        # the temp settings is quite dirty here…
-        # self.settings = Dict()
-        # self._auto_fill_key(self.settings,["font_directory"] 
         self.fonts = load_font_list(self.settings.font_paths, sort=self._fonts_need_sorting)
-
-        # if self.is_attribute_real("font_paths"):
-        #     font_paths = [self.director.root_dir / p for p in self.font_paths]
-        #     self.fonts = load_font_list(font_paths)
-        # elif self.font_directory != None:
-        #     self.fonts = load_font_dir(self.director.root_dir / self.font_directory)
-        # else:
-        #     self.fonts = load_font_dir(self.director.input_path)
-        # self.font_paths = [str(f.path.relative_to(self.director.root_dir)) for f in self.fonts]
 
     # ----------------------------------------
     
@@ -341,7 +226,6 @@ class SMFontCollection(SMSettings):
     def font_collection_filename(self):
         return self.font_collection_name.replace(" ", "")
     
-
     # ----------------------------------------
     # formatted strings
         
@@ -369,8 +253,6 @@ class SMFontCollection(SMSettings):
                           font=font.path, **kwargs)
         return fs
 
-
-
     # ----------------------------------------
     # access font
 
@@ -387,8 +269,6 @@ class SMFontCollection(SMSettings):
     
     def draw(self):
         pass
-
-
 
 
 class SMGlyphSorterQuery(SMBase):
@@ -483,6 +363,7 @@ class SMTemplateAllPages(SMTemplate):
             with page:
                 self._draw()
 
+# ----------------------------------------
 
 FONT_COLLECTION_SECTION_IDENTIFIER = "fonts"
 
@@ -551,7 +432,7 @@ class SMDirector(SMBase):
         for s in self.settings:
             if s["template"] == FONT_COLLECTION_SECTION_IDENTIFIER:
                 fonts = self.init_section_from_settings(s)
-                # self.templates.append(fonts)
+                self.templates.append(fonts)
                 setattr(self, FONT_COLLECTION_SECTION_IDENTIFIER, fonts)
 
     def load_templates(self):
@@ -566,27 +447,6 @@ class SMDirector(SMBase):
         if template_class:
             settings = template_dict.get("settings", {})
             return template_class(self, settings)
-
-
-    # def assign_required_section_to_attributes(self, attr, section):
-    #     target_class = self.template_map.get(attr)
-    #     if target_class:
-    #         for section in self.templates:
-    #             if type(section) == target_class:
-    #                 setattr(self, attr, section)
-
-
-    # def populate_required_sections(self):
-    #     for attr in self.required_attributes:
-    #         section = getattr(self, attr)
-    #         section.populate_attributes()
-
-    # def populate_other_sections(self):
-    #     for section in self.templates:
-    #         # section = getattr(self, attr)
-    #         section.populate_attributes()
-
-
 
     def draw(self, output_dir=None):
 
@@ -628,10 +488,10 @@ class SMDirector(SMBase):
             template.draw()
 
     def get_settings_as_list(self):
-        out = [{"type": self.reverse_template_map[section.__class__], "settings": section.settings_fill.to_dict()} for section in self.templates]
-        for section in out:
-            if len(section["settings"]) == 0:
-                del section["settings"]
+        out = [{"template": self.reverse_template_map[template.__class__], "settings": template.settings_fill.to_dict()} for template in self.templates]
+        for template in out:
+            if len(template["settings"]) == 0:
+                del template["settings"]
         return out 
 
     def write_settings_file(self):
@@ -639,17 +499,6 @@ class SMDirector(SMBase):
         out = self.get_settings_as_list()
         self.yaml_write_settings_to_path(out, self.settings_path)
 
-
-    # def smart_populate_settings_file(self):
-    #     """
-    #     this only dump settings that where populated
-    #     """
-    #     print("-- updating setting file (if required)")
-    #     out = [{"type": self.reverse_template_map[section.__class__], "settings": section.user_populated_settings} for section in self.templates]
-    #     for section in out:
-    #         if len(section["settings"]) == 0:
-    #             del section["settings"]
-    #     self.yaml_dump_sections_to_path(out, self.settings_path)
 
     @property
     def reverse_template_map(self):

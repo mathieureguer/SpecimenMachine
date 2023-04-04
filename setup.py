@@ -24,6 +24,7 @@ setup(name="SpecimenMachine",
         ],
       install_requires=[
         #"drawBot",
+        "pyaml",
         "fontTools",
         "hyperglot",
 
