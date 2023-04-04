@@ -45,14 +45,14 @@ feature_descriptions = load_yaml_from_path(FEATURE_DESCRIPTIONS_PATH)
 # ----------------------------------------
 
 def load_font_dir(path, sort=True):
-    font_paths = walk_path(path)
+    font_paths = walk_font_dir(path)
     return load_fonts_from_paths(font_paths, sort=sort)
 
 def load_font_list(list_of_path, sort=False):
     font_paths = []
     for p in list_of_path:
         p = pathlib.Path(p)
-        font_paths += walk_path(p)
+        font_paths += walk_font_dir(p)
     return load_fonts_from_paths(font_paths, sort=sort)
     return fonts
 
@@ -63,7 +63,7 @@ def load_fonts_from_paths(list_of_paths, sort=True):
     return fonts
 
 
-def walk_path(path):
+def walk_font_dir(path):
     file_types = [".otf", ".ttf", ".woff", ".woff2"]
     path = pathlib.Path(path)
     if not path.exists():
@@ -88,7 +88,7 @@ class HyperglotAssistant:
         self.langs = hyperglot.languages.Languages(strict=strict_iso)
         # print(f"loaded langs in {time.time()-t} sec")
 
-    def collect_language_support(self, font_path):
+    def collect_language_support(self, font_path, speaker_threshold=0):
         support = "base"
         decomposed = False
         marks = False
@@ -112,7 +112,7 @@ class HyperglotAssistant:
         out = {}
         for script, langs in supported.items():
             # out[script] = [f"{lang.get_name()} ({iso})" for iso, lang in langs.items()]
-            out[script] = [f"{lang.get_name()}" for iso, lang in langs.items()]
+            out[script] = [f"{lang.get_name()}" for iso, lang in langs.items() if lang.get("speakers", 0)>=speaker_threshold]
         return out
 
 # ----------------------------------------
@@ -286,6 +286,10 @@ class FontWrapper(TTFont):
     def language_support(self):
         hyperglot = HyperglotAssistant()
         return hyperglot.collect_language_support(self.path)
+
+    def get_language_support(self, speaker_threshold=0):
+        hyperglot = HyperglotAssistant()
+        return hyperglot.collect_language_support(self.path, speaker_threshold=speaker_threshold)
 
     # handy methods
 
