@@ -462,7 +462,7 @@ class SMGlyphSorter(SMBase):
         return categories
 
 
-class SMSection(SMSettings):
+class SMTemplate(SMSettings):
 
     # def __init__(self, director, settings):
     #     super().__init__(director, settings)
@@ -475,7 +475,7 @@ class SMSection(SMSettings):
         print(f"must overide {self}._draw()")
 
 
-class SMSectionAllPages(SMSection):
+class SMTemplateAllPages(SMTemplate):
 
     def draw(self):
         print(f"-- drawing {self}")
@@ -488,15 +488,15 @@ FONT_COLLECTION_SECTION_IDENTIFIER = "fonts"
 
 class SMDirector(SMBase):
 
-    section_map = {
+    template_map = {
         "fonts" : SMFontCollection
         }
 
-    defaults = {}
+    defaults = []
 
     def __init__(self, input_path, single_font_mode=False):
 
-        assert FONT_COLLECTION_SECTION_IDENTIFIER in self.section_map
+        assert FONT_COLLECTION_SECTION_IDENTIFIER in self.template_map
 
         # ----------------------------------------
         
@@ -511,9 +511,9 @@ class SMDirector(SMBase):
         
         # ----------------------------------------
         
-        self.sections = []
+        self.templates = []
         self.load_font_collection()
-        self.load_sections()
+        self.load_templates()
 
         # should this be dealt with at a higher level?
         self.single_font_mode = single_font_mode
@@ -524,8 +524,8 @@ class SMDirector(SMBase):
         setting_paths = list(self.root_dir.glob("*" + SETTINGS_FILE_NAME))
         if len(setting_paths) == 0:
             print(f"-- No setting file found, creating {self.settings_path.relative_to(self.root_dir)}")
-            self.settings = self.default
-            self.yaml_dump_sections_to_path(self.settings, self.settings_path)
+            self.settings = self.defaults
+            self.yaml_write_settings_to_path(self.settings, self.settings_path)
         else:
             self.settings_path = setting_paths[0]
             print(f"-- loading settings from {self.settings_path.relative_to(self.root_dir)}")
@@ -533,11 +533,11 @@ class SMDirector(SMBase):
                 self.settings = yaml.safe_load(setting_file.read())
 
 
-    def yaml_dump_sections_to_path(self, sections, path):
+    def yaml_write_settings_to_path(self, templates, path):
         with open(path, "w+") as out_file:
             out_str = []
-            for s in sections:
-                out_str.append(yaml.dump([s],
+            for template in templates:
+                out_str.append(yaml.dump([template],
                         sort_keys=False, 
                         allow_unicode=True,
                         line_break=False,
@@ -549,29 +549,29 @@ class SMDirector(SMBase):
 
     def load_font_collection(self):
         for s in self.settings:
-            if s["type"] == FONT_COLLECTION_SECTION_IDENTIFIER:
+            if s["template"] == FONT_COLLECTION_SECTION_IDENTIFIER:
                 fonts = self.init_section_from_settings(s)
-                self.sections.append(fonts)
+                # self.templates.append(fonts)
                 setattr(self, FONT_COLLECTION_SECTION_IDENTIFIER, fonts)
 
-    def load_sections(self):
+    def load_templates(self):
         for s in self.settings:
-            if s["type"] in self.section_map and s["type"] != FONT_COLLECTION_SECTION_IDENTIFIER:
-                section = self.init_section_from_settings(s)
-                self.sections.append(section)
+            if s["template"] in self.template_map and s["template"] != FONT_COLLECTION_SECTION_IDENTIFIER:
+                template = self.init_section_from_settings(s)
+                self.templates.append(template)
  
 
-    def init_section_from_settings(self, section_dict):
-        section_class = self.section_map.get(section_dict["type"])
-        if section_class:
-            settings = section_dict.get("settings", {})
-            return section_class(self, settings)
+    def init_section_from_settings(self, template_dict):
+        template_class = self.template_map.get(template_dict["template"])
+        if template_class:
+            settings = template_dict.get("settings", {})
+            return template_class(self, settings)
 
 
     # def assign_required_section_to_attributes(self, attr, section):
-    #     target_class = self.section_map.get(attr)
+    #     target_class = self.template_map.get(attr)
     #     if target_class:
-    #         for section in self.sections:
+    #         for section in self.templates:
     #             if type(section) == target_class:
     #                 setattr(self, attr, section)
 
@@ -582,7 +582,7 @@ class SMDirector(SMBase):
     #         section.populate_attributes()
 
     # def populate_other_sections(self):
-    #     for section in self.sections:
+    #     for section in self.templates:
     #         # section = getattr(self, attr)
     #         section.populate_attributes()
 
@@ -591,7 +591,7 @@ class SMDirector(SMBase):
     def draw(self, output_dir=None):
 
         # if self.single_font_mode:
-        #     targets = [self.section_map["fonts"](self, {"font_paths": [path]}) for path in self.fonts.font_paths]
+        #     targets = [self.template_map["fonts"](self, {"font_paths": [path]}) for path in self.fonts.font_paths]
         # else:
         #     targets = [self.fonts]
 
@@ -617,18 +617,18 @@ class SMDirector(SMBase):
 
     def _draw(self):
         draw_last = []
-        for section in self.sections:
-            if issubclass(type(section), SMSectionAllPages):
-                draw_last.append(section)
-            elif issubclass(type(section), SMFontCollection):
+        for template in self.templates:
+            if issubclass(type(template), SMTemplateAllPages):
+                draw_last.append(template)
+            elif issubclass(type(template), SMFontCollection):
                 pass
             else:
-                section.draw()
-        for section in draw_last:
-            section.draw()
+                template.draw()
+        for template in draw_last:
+            template.draw()
 
     def get_settings_as_list(self):
-        out = [{"type": self.reverse_section_map[section.__class__], "settings": section.settings_fill.to_dict()} for section in self.sections]
+        out = [{"type": self.reverse_template_map[section.__class__], "settings": section.settings_fill.to_dict()} for section in self.templates]
         for section in out:
             if len(section["settings"]) == 0:
                 del section["settings"]
@@ -637,7 +637,7 @@ class SMDirector(SMBase):
     def write_settings_file(self):
         print("-- saving setting file")
         out = self.get_settings_as_list()
-        self.yaml_dump_sections_to_path(out, self.settings_path)
+        self.yaml_write_settings_to_path(out, self.settings_path)
 
 
     # def smart_populate_settings_file(self):
@@ -645,12 +645,12 @@ class SMDirector(SMBase):
     #     this only dump settings that where populated
     #     """
     #     print("-- updating setting file (if required)")
-    #     out = [{"type": self.reverse_section_map[section.__class__], "settings": section.user_populated_settings} for section in self.sections]
+    #     out = [{"type": self.reverse_template_map[section.__class__], "settings": section.user_populated_settings} for section in self.templates]
     #     for section in out:
     #         if len(section["settings"]) == 0:
     #             del section["settings"]
     #     self.yaml_dump_sections_to_path(out, self.settings_path)
 
     @property
-    def reverse_section_map(self):
-        return {v:k for k, v in self.section_map.items()}
+    def reverse_template_map(self):
+        return {v:k for k, v in self.template_map.items()}
