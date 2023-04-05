@@ -1,5 +1,5 @@
 # import drawbotgrid.grid as dbgrid
-from fontHelpers import load_font_dir, load_font_list, walk_font_dir
+from . import fontHelpers
 
 import drawBot as db
 from fontTools.ttLib import TTFont
@@ -175,13 +175,19 @@ class SMFontCollection(SMSettings):
   
     def autofill_font_paths(self):
         self._fonts_need_sorting = True
-        return walk_font_dir(self.settings["font_directory"])
+        return fontHelpers.walk_font_dir(self.settings["font_directory"])
 
     # ----------------------------------------
     
     def load_fonts(self):
-        self.fonts = load_font_list(self.settings.font_paths, sort=self._fonts_need_sorting)
+        print(self.absolute_font_paths)
+        self.fonts = fontHelpers.load_font_list(self.absolute_font_paths, sort=self._fonts_need_sorting)
 
+    @property
+    def absolute_font_paths(self):
+        dir_ = pathlib.Path(self.settings.font_directory)
+        return [dir_ / font_path for font_path in self.settings.font_paths]
+    
     # ----------------------------------------
     
     def get_common_fonts_attribute(self, attribute):
