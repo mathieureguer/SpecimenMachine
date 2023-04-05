@@ -21,6 +21,7 @@ setup(name="SpecimenMachine",
       license="All rights reserved",
       packages=[
         "SpecimenMachine",
+        "SpecimenMachine.fontHelpers",
         ],
       install_requires=[
         #"drawBot",
