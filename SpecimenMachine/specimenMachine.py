@@ -148,7 +148,7 @@ class SMSettings(SMBase):
                 raise KeyError
 
     def _get_autofill_funct_name(self, chained_keys):
-        return f"autofill_{'_'.join(chained_keys)}"
+        return f"autofill_{'_'.join(chained_keys)}".lower()
  
 
 class SMFontCollection(SMSettings):

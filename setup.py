@@ -7,7 +7,7 @@ from setuptools import setup
 #         return f.read()
 
 setup(name="SpecimenMachine",
-      version="0.3",
+      version="0.3.1",
       description="a little tool to build type specimen with DrawBot",
       long_description="TBD",
       classifiers=[
@@ -28,6 +28,7 @@ setup(name="SpecimenMachine",
         "pyaml",
         "fontTools",
         "hyperglot",
+        "addict",
 
       ],
       include_package_data=True,
