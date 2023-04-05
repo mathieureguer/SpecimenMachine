@@ -180,7 +180,6 @@ class SMFontCollection(SMSettings):
     # ----------------------------------------
     
     def load_fonts(self):
-        print(self.absolute_font_paths)
         self.fonts = fontHelpers.load_font_list(self.absolute_font_paths, sort=self._fonts_need_sorting)
 
     @property
