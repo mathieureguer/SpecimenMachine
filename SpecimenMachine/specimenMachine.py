@@ -1,5 +1,5 @@
 # import drawbotgrid.grid as dbgrid
-from .fontHelpers import load_font_dir, load_font_list, walk_font_dir
+from fontHelpers import load_font_dir, load_font_list, walk_font_dir
 
 import drawBot as db
 from fontTools.ttLib import TTFont
