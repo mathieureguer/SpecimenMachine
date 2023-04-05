@@ -166,7 +166,6 @@ class SMFontCollection(SMSettings):
         self.load_fonts()
         font_paths = [str(f.path.relative_to(self.director.root_dir)) for f in self.fonts]
         self.settings.font_paths = font_paths
-        self.settings_fill.font_paths = font_paths
 
     # ----------------------------------------
     
@@ -174,13 +173,15 @@ class SMFontCollection(SMSettings):
         return self.director.input_path
   
     def autofill_font_paths(self):
-        self._fonts_need_sorting = True
-        return fontHelpers.walk_font_dir(self.settings["font_directory"])
-
+        font_path_unsorted = fontHelpers.walk_font_dir(self.settings["font_directory"])
+        self.fonts = fontHelpers.load_font_list(font_path_unsorted, sort=True)
+        font_paths_sorted = [str(f.path.relative_to(self.director.root_dir)) for f in self.fonts]
+        return font_paths_sorted
+        
     # ----------------------------------------
     
     def load_fonts(self):
-        self.fonts = fontHelpers.load_font_list(self.absolute_font_paths, sort=self._fonts_need_sorting)
+        self.fonts = fontHelpers.load_font_list(self.absolute_font_paths)
 
     @property
     def absolute_font_paths(self):
