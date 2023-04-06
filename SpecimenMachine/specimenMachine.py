@@ -276,6 +276,19 @@ class SMFontCollection(SMSettings):
     def draw(self):
         pass
 
+    # ----------------------------------------
+    
+    def get_fonts_as_list_of_single_font_collections(self):
+        return [self.__class__(self.director, {"font_directory": self.settings.font_directory, "font_paths": [font_path]}) for font_path in self.settings.font_paths]
+
+class SMSingleFontCollection(SMFontCollection):
+
+    def __init__(self, director, font):
+        super().__init__(director, {})
+        
+    def _did_autofill_private(self):
+        self.fonts = font
+
 
 class SMGlyphSorterQuery(SMBase):
 
@@ -456,30 +469,33 @@ class SMDirector(SMBase):
 
     def draw(self, output_dir=None):
 
-        # if self.single_font_mode:
-        #     targets = [self.template_map["fonts"](self, {"font_paths": [path]}) for path in self.fonts.font_paths]
-        # else:
-        #     targets = [self.fonts]
+        if self.single_font_mode:
+            targets = self.fonts.get_fonts_as_list_of_single_font_collections()
+        else:
+            targets = [self.fonts]
 
-        # original_fonts = self.fonts
+        print(self.single_font_mode)
+        print(targets)
 
-        # for fonts in targets:
-            # self.fonts = fonts
+        original_fonts = self.fonts
 
-        now = datetime.datetime.now()
-        db.newDrawing()
-        self._draw()
+        for fonts in targets:
+            self.fonts = fonts
 
-        if output_dir == None:
-            output_dir = self.root_dir
+            now = datetime.datetime.now()
+            db.newDrawing()
+            self._draw()
 
-        out = output_dir / f"{now.strftime('%Y%m%d-%H%M')}-specimenMachine-{self.fonts.font_collection_filename}.pdf"
-        db.saveImage(out)
-        print(f"-- saved {out}")
+            if output_dir == None:
+                output_dir = self.root_dir
 
-        db.endDrawing()
+            out = output_dir / f"{now.strftime('%Y%m%d-%H%M')}-specimenMachine-{self.fonts.font_collection_filename}.pdf"
+            db.saveImage(out)
+            print(f"-- saved {out}")
 
-        # self.fonts = original_fonts
+            db.endDrawing()
+
+        self.fonts = original_fonts
 
     def _draw(self):
         draw_last = []
