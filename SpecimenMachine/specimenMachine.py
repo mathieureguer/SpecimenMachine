@@ -22,6 +22,12 @@ FILL_TOKEN  = "<fill>"
 def path_presenter(dumper, data):
     return dumper.represent_scalar('tag:yaml.org,2002:str', str(data))
 
+def str_presenter(dumper, data):
+  if len(data.splitlines()) > 1:  # check for multiline string
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+  return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+
+yaml.add_representer(str, str_presenter)
 yaml.add_representer(pathlib.PosixPath, path_presenter)
 
 # ----------------------------------------
