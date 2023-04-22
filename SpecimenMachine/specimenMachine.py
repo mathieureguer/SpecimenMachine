@@ -480,9 +480,6 @@ class SMDirector(SMBase):
         else:
             targets = [self.fonts]
 
-        print(self.single_font_mode)
-        print(targets)
-
         original_fonts = self.fonts
 
         for fonts in targets:
