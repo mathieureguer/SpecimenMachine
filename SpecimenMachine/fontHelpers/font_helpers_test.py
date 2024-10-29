@@ -1,12 +1,11 @@
-import fontHelpers
-import pprint
+import hyperglot.parse
+import hyperglot.languages
+import hyperglot.main
 
-import specimenMachine
+langs = hyperglot.languages.Languages(strict=False)
+print(langs)
 
-f = fontHelpers.FontWrapper("/Users/mathieu/Dropbox/10 current work/00 clients/Formagari/2022 specimen machine/00 sources/target fonts/Insitu-Bold.otf")
 
-cat = specimenMachine.SMGlyphSorter()
+l = langs["fra"]
+print(l["speakers"])
 
-c = cat.categorise_glyph_for_font(f)
-
-pprint.pprint(c)

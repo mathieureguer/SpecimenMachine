@@ -8,7 +8,7 @@ import unicodedata
 
 import hyperglot.parse
 import hyperglot.languages
-import hyperglot.main
+# import hyperglot.main
 
 # ----------------------------------------
 

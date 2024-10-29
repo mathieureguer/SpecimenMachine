@@ -470,7 +470,10 @@ class SMDirector(SMBase):
     def init_section_from_settings(self, template_dict):
         template_class = self.template_map.get(template_dict["template"])
         if template_class:
-            settings = template_dict.get("settings", {})
+            settings = {}
+            # if hasattr(template_class, "defaults"):
+            #     settings.update(template_class.defaults)
+            settings.update(template_dict.get("settings", {}))
             return template_class(self, settings)
 
     def draw(self, output_dir=None):
