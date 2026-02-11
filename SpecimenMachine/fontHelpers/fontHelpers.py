@@ -6,9 +6,10 @@ import datetime
 import time
 import unicodedata
 
-import hyperglot.parse
-import hyperglot.languages
+# import hyperglot.parse
+# import hyperglot.languages
 # import hyperglot.main
+import hyperglot.checker
 
 # ----------------------------------------
 
@@ -85,7 +86,7 @@ class HyperglotAssistant:
     def __init__(self):
         t = time.time()
         strict_iso = False
-        self.langs = hyperglot.languages.Languages(strict=strict_iso)
+        # self.langs = hyperglot.languages.Languages(strict=strict_iso)
         # print(f"loaded langs in {time.time()-t} sec")
 
     def collect_language_support(self, font_path, speaker_threshold=0):
@@ -98,17 +99,17 @@ class HyperglotAssistant:
         include_constructed = False
 
         t = time.time()
-        chars = hyperglot.parse.parse_font_chars(font_path)
-        # print(f"parsed font chars in {time.time()-t} sec")
-
+        # chars = hyperglot.parse.parse_font_chars(font_path)
+        # # print(f"parsed font chars in {time.time()-t} sec")
+        hg_check = hyperglot.checker.FontChecker(font_path)
         t = time.time()
-        supported = self.langs.supported(chars, support, validity,
-                                    decomposed, marks,
-                                    include_all_orthographies,
-                                    include_historical,
-                                    include_constructed)
+        # supported = self.langs.supported(chars, support, validity,
+        #                             decomposed, marks,
+        #                             include_all_orthographies,
+        #                             include_historical,
+        #                             include_constructed)
         # print(f"identified supported langs in {time.time()-t} sec")
-
+        supported = hg_check.get_supported_languages()
         out = {}
         for script, langs in supported.items():
             # out[script] = [f"{lang.get_name()} ({iso})" for iso, lang in langs.items()]
@@ -271,11 +272,19 @@ class FontWrapper(TTFont):
 
     @property
     def designer(self):
-        return self.name.getDebugName(9)
+        out = self.name.getDebugName(9)
+        if not out:
+            return ""
+        else:
+            return out
 
     @property
     def copyright(self):
-        return self.name.getDebugName(0)
+        out = self.name.getDebugName(0)
+        if not out:
+            return ""
+        else:
+            return out
 
 
     @property

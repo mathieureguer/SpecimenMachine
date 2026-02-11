@@ -7,7 +7,7 @@ from setuptools import setup
 #         return f.read()
 
 setup(name="SpecimenMachine",
-      version="0.3.2",
+      version="0.3.3",
       description="a little tool to build type specimen with DrawBot",
       long_description="TBD",
       classifiers=[

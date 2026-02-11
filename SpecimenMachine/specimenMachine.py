@@ -108,7 +108,7 @@ class SMSettings(SMBase):
     def _autofill_settings(self):
         """
         this autofill values for both autofill tokens of key at a time 
-        (allowing autofill functions to reference preveious keys)
+        (allowing autofill functions to reference previous keys)
         """
         self.settings_fill = Dict()
         self.settings = Dict()
@@ -196,8 +196,9 @@ class SMFontCollection(SMSettings):
     
     # ----------------------------------------
     
-    def get_common_fonts_attribute(self, attribute):
+    def get_common_fonts_attribute(self, attribute, default="None"):
         attrs = [getattr(f, attribute) for f in self.fonts]
+        attrs = [default if a is None else a for a in attrs]
         return self._remove_duplicate_in_list(attrs)
 
     def _remove_duplicate_in_list(self, list_):
